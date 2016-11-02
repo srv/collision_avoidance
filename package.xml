@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package>
+  <name>collision_avoidance</name>
+  <version>0.0.1</version>
+  <description>
+    Collision avoidance based on stereo images and/or sonar
+  </description>
+  <author email="pl.negre@uib.cat">Pep Lluis Negre</author>
+  <maintainer email="pl.negre@uib.cat">Pep Lluis Negre</maintainer>
+  <license>BSD</license>
+  <url type="website">https://github.com/srv/collision_avoidance</url>
+  <url type="bugtracker">https://github.com/srv/collision_avoidance/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>image_geometry</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>message_filters</build_depend>
+  <build_depend>message_generation</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>cv_bridge</run_depend>
+  <run_depend>image_geometry</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>pcl_ros</run_depend>
+  <run_depend>message_filters</run_depend>
+
+</package>
