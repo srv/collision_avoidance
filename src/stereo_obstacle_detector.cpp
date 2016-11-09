@@ -1,7 +1,5 @@
 #include <ros/ros.h>
 
-#include <boost/lexical_cast.hpp>
-
 #include <pcl/point_types.h>
 #include <pcl/common/common.h>
 #include <pcl_ros/point_cloud.h>
@@ -26,7 +24,7 @@ class StereoObstacleDetector
   double min_range_;
   double max_range_;
   int min_obstacle_points_;
-  double min_obstacle_size_xy_;
+  double min_obstacle_size_;
 
 public:
   StereoObstacleDetector() : nh_private_("~")
@@ -34,7 +32,7 @@ public:
     nh_private_.param("min_range", min_range_, 0.3);
     nh_private_.param("max_range", max_range_, 5.0);
     nh_private_.param("min_obstacle_points", min_obstacle_points_, 100);
-    nh_private_.param("min_obstacle_size_xy", min_obstacle_size_xy_, 0.06);
+    nh_private_.param("min_obstacle_size", min_obstacle_size_, 0.06);
     point_cloud_sub_ = nh_.subscribe<PointCloud>("point_cloud", 1, &StereoObstacleDetector::pointCloudCb, this);
     pub_obstacle_info_ = nh_private_.advertise<collision_avoidance::ObstacleInfo>("obstacle_info", 2, true);
   }
@@ -65,9 +63,12 @@ public:
     // Init
     collision_avoidance::ObstacleInfo o_info;
     o_info.min_points = min_obstacle_points_;
-    o_info.min_size = min_obstacle_size_xy_;
+    o_info.min_size = min_obstacle_size_;
     o_info.points = cloud->points.size();
+    o_info.width = 0.0;
+    o_info.height = 0.0;
     o_info.size = 0.0;
+    o_info.distance = -1.0;
 
     // Count the number of points detected
     if (cloud->points.size() < min_obstacle_points_)
@@ -79,12 +80,19 @@ public:
       // Obstacle size (x,y)
       Point min_pt, max_pt;
       pcl::getMinMax3D(*cloud, min_pt, max_pt);
-      double obstacle_size = fabs((max_pt.x - min_pt.x) * (max_pt.y - min_pt.y));
-      o_info.size = obstacle_size;
-      if (obstacle_size > min_obstacle_size_xy_)
-        o_info.detection = true;
+      double width  = fabs(max_pt.x - min_pt.x);
+      double height = fabs(max_pt.y - min_pt.y);
+      double size   = width * height;
+      if (size > min_obstacle_size_)
+      {
+        o_info.width      = width;
+        o_info.height     = height;
+        o_info.size       = size;
+        o_info.distance   = min_pt.z;
+        o_info.detection  = true;
+      }
       else
-        o_info.detection = false;
+        o_info.detection  = false;
     }
 
     // Publish obstacle info

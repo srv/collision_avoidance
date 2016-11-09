@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   pcl_ros
   message_generation
+  miniking_ros
+  std_msgs
   cmake_modules)
 
 add_message_files(
@@ -52,3 +54,13 @@ target_link_libraries(stereo_obstacle_detector
   ${PCL_LIBRARIES}
   ${catkin_LIBRARIES})
 add_dependencies(stereo_obstacle_detector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+# Sonar obstacle detector node
+add_executable(sonar_obstacle_detector
+  src/sonar_obstacle_detector.cpp)
+target_link_libraries(sonar_obstacle_detector
+  ${EIGEN3_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${PCL_LIBRARIES}
+  ${catkin_LIBRARIES})
+add_dependencies(sonar_obstacle_detector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
