@@ -97,7 +97,7 @@ public:
       for (size_t i=0; i<x_peak.size(); i++)
       {
         // Convert point to image coordinates
-        double u = combined.cols * x_peak[i] / (max_range_-min_range_);
+        double u = (x_peak[i] - min_range_) * combined.cols / (max_range_ - min_range_); //combined.cols * x_peak[i] / (max_range_-min_range_);
         double v = combined.rows * (100.0-y_peak[i]) / 100;
         cv::Point2d p(u,v);
         cv::circle(combined, p, 5, cv::Scalar(50, 255, 50));
@@ -114,9 +114,11 @@ public:
   }
 
   std::vector<double> lowPassFilter(const std::vector<double>& input,
-                                    const int& order = 10,
-                                    const double& gain = 1)
+                                    const int& order = 10)
   {
+
+    // Get the maximum
+    double max_in = *std::max_element(input.begin(), input.end());
 
     std::vector<double> output;
     for (size_t n=0; n<input.size(); n++)
@@ -129,8 +131,14 @@ public:
         sum += 0.01 * input[idx];
         idx--;
       }
-      output.push_back(sum*gain);
+      output.push_back(sum);
     }
+
+    // Preserve scale
+    double max_out = *std::max_element(output.begin(), output.end());
+    double gain = max_in / max_out;
+    for (size_t i=0; i<output.size(); i++)
+      output[i] = output[i] * gain;
 
     return output;
   }
@@ -139,7 +147,7 @@ public:
                     const std::vector<double>& y,
                     std::vector<double>& x_peak,
                     std::vector<double>& y_peak,
-                    const double& delta = 0.8)
+                    const double& delta = 0.1)
   {
     x_peak.clear();
     y_peak.clear();
@@ -176,7 +184,7 @@ public:
       }
       else
       {
-        if (y[i] < mn+delta)
+        if (y[i] > mn+delta)
         {
           mx = y[i];
           mxpos = x[i];
